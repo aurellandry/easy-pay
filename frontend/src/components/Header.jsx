@@ -1,8 +1,30 @@
-import { Navbar, Nav, Container } from 'react-bootstrap';
+import { Navbar, Nav, Container, NavDropdown, Badge } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
+import { useNavigate } from 'react-router-dom';
 import { FaSignInAlt, FaSignOutAlt } from 'react-icons/fa';
+import { useSelector, useDispatch } from 'react-redux';
+import { useLogoutMutation } from '../slices/usersApiSlice';
+import { clearCredentials } from '../slices/authSlice';
+import { toast } from 'react-toastify';
 
 const Header = () => {
+  const { userInfo } = useSelector((state) => state.auth);
+
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const [logout] = useLogoutMutation();
+
+  const logoutHandler = async (e) => {
+    try {
+      await logout().unwrap();
+      dispatch(clearCredentials());
+      navigate('/');
+    } catch (err) {
+      toast.error(err);
+    }
+  };
+
   return (
     <header>
       <Navbar bg='dark' variant='dark' expand='lg' collapseOnSelect>
@@ -13,16 +35,31 @@ const Header = () => {
           <Navbar.Toggle aria-controls='basic-navbar-nav' />
           <Navbar.Collapse id='basic-navbar-nav'>
             <Nav className='ms-auto'>
-              <LinkContainer to='/login'>
-                <Nav.Link>
-                  <FaSignInAlt /> Se connecter
-                </Nav.Link>
-              </LinkContainer>
-              <LinkContainer to='/register'>
-                <Nav.Link>
-                  <FaSignOutAlt /> S'inscrire
-                </Nav.Link>
-              </LinkContainer>
+              { userInfo ? (
+                <>
+                  <NavDropdown title={userInfo.name} id='username'>
+                    <LinkContainer to='/profile'>
+                      <NavDropdown.Item>
+                        Profil
+                      </NavDropdown.Item>
+                    </LinkContainer>
+                    <NavDropdown.Item onClick={ logoutHandler }>Déconnexion</NavDropdown.Item>
+                  </NavDropdown>
+                </>
+              ) : (
+                <>
+                  <LinkContainer to='/login'>
+                    <Nav.Link>
+                      <FaSignInAlt /> Connexion
+                    </Nav.Link>
+                    </LinkContainer>
+                    <LinkContainer to='/register'>
+                      <Nav.Link>
+                        <FaSignOutAlt /> Inscription
+                      </Nav.Link>
+                  </LinkContainer>
+                </>
+              ) }
             </Nav>
           </Navbar.Collapse>
         </Container>
