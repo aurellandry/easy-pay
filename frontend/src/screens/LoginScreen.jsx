@@ -2,10 +2,12 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Form, Button, Row, Col } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
-import FormContainer from '../components/FormContainer';
+import { toast } from 'react-toastify';
+
 import { useLoginMutation } from '../slices/usersApiSlice';
 import { setCredentials } from '../slices/authSlice';
-import { toast } from 'react-toastify';
+import FormContainer from '../components/FormContainer';
+import Loader from '../components/Loader';
 
 const LoginScreen = () => {
   const [email, setEmail] = useState('');
@@ -22,7 +24,7 @@ const LoginScreen = () => {
     if (userInfo) {
       navigate('/');
     }
-  }, [navigate, userInfo])
+  }, [navigate, userInfo]);
   
 
   const submitHandler = async (e) => {
@@ -61,7 +63,9 @@ const LoginScreen = () => {
           ></Form.Control>
         </Form.Group>
 
-        <Button type='submit' variant='primary' className='mt-3'>
+        { isLoading && <Loader /> }
+
+        <Button type='submit' variant='primary' className='mt-3' disabled={isLoading}>
           Connexion
         </Button>
 
