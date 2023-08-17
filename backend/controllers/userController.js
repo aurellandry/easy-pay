@@ -15,10 +15,10 @@ const authUser = asyncHandler(async (req, res) => {
   const user = await UserRetriever.retrieveOne({ email });
   if (user && (await user.matchPassword(password))) {
     // Saves the token in a HTTP Cookie
-    generateToken(res, user._id);
+    generateToken(res, user.id);
 
     res.status(constants.HTTP_CREATED).json({
-      _id: user._id,
+      id: user.id,
       firstName: user.firstName,
       lastName: user.lastName,
       phone: user.phone,
@@ -54,10 +54,10 @@ const registerUser = asyncHandler(async (req, res) => {
 
   if (user) {
     // Saves the token in a HTTP Cookie
-    generateToken(res, user._id);
+    generateToken(res, user.id);
 
     res.status(constants.HTTP_CREATED).json({
-      _id: user._id,
+      id: user.id,
       firstName: user.firstName,
       lastName: user.lastName,
       phone: user.phone,
@@ -92,7 +92,7 @@ const logoutUser = asyncHandler(async (req, res) => {
  */
 const getUserProfile = asyncHandler(async (req, res) => {
   const user = {
-    _id: req.user._id,
+    id: req.user.id,
     firstName: req.user.firstName,
     lastName: req.user.lastName,
     phone: req.user.phone,
@@ -108,7 +108,7 @@ const getUserProfile = asyncHandler(async (req, res) => {
  * @access  Private
  */
 const updateUserProfile = asyncHandler(async (req, res) => {
-  const user = await UserRetriever.retrieveById(req.user._id);
+  const user = await UserRetriever.retrieveById(req.user.id);
 
   if (user) {
     user.firstName = req.body.firstName || user.firstName;
@@ -123,7 +123,7 @@ const updateUserProfile = asyncHandler(async (req, res) => {
     const updatedUser = await UserUpdater.save(user);
 
     res.status(constants.HTTP_OK).json({
-      _id: updatedUser._id,
+      id: updatedUser.id,
       firstName: updatedUser.firstName,
       lastName: updatedUser.lastName,
       phone: updatedUser.phone,

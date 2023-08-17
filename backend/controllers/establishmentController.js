@@ -14,24 +14,24 @@ import { isValidObjectId } from 'mongoose';
 const create = asyncHandler(async (req, res) => {
   const { name, address, additionalAddress } = req.body;
 
-  const establishmentExists = await EstablishmentRetriever.retrieveOne({ email });
+  const establishmentExists = await EstablishmentRetriever.retrieveOne({ name });
   if (establishmentExists)  {
     res.status(constants.HTTP_BAD_REQUEST);
     throw new Error('Cet établissement existe déjà.')
   }
 
   const establishment = await EstablishmentUpdater.create({
-    name,
-    address,
-    additionalAddress,
-    userIds: [req.user._id],
+    name: name,
+    address: address,
+    additionalAddress: additionalAddress,
+    userIds: [req.user.id],
   });
   if (establishment) {
     res.status(constants.HTTP_CREATED).json(establishment);
+  } else {
+    res.status(constants.HTTP_BAD_REQUEST);
+    throw new Error('Impossible de créer l\'établissement. Vérifiez les données saisies.');
   }
-
-  res.status(constants.HTTP_BAD_REQUEST);
-  throw new Error('Impossible de créer l\'établissement. Vérifiez les données saisies.');
 });
 
 /**
@@ -97,7 +97,7 @@ const update = asyncHandler(async (req, res) => {
     
     if (req.body.userEmails) {
       const users = await UserRetriever.retrieveAll({ email: req.body.userEmails });
-      const userIds = users.map((user) => user._id);
+      const userIds = users.map((user) => user.id);
       establishment.userIds = Tools.arrayUnique(establishment.userIds.concat(userIds));
     }
     const updatedEstablishment = await EstablishmentUpdater.save(establishment);

@@ -12,7 +12,7 @@ const EstablishmentRetriever = {
     return establishment;
   },
   retrieveById: async (id) => {
-    const establishment = await Establishment.find({ _id: parseInt(id) });
+    const establishment = await Establishment.find({ id });
   
     return establishment;
   },

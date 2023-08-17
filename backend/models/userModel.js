@@ -1,7 +1,13 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
+import { getNextModelID } from './sequenceModel.js';
 
 const userSchema = mongoose.Schema({
+  id: {
+    type: Number,
+    required: false,
+    unique: true,
+  },
   firstName: {
     type: String,
     required: true,
@@ -32,6 +38,10 @@ const userSchema = mongoose.Schema({
 });
 
 userSchema.pre('save', async function (next) {
+  if (this.isNew) {
+    this.id = await getNextModelID('user_id');
+  }
+
   if (!this.isModified('password')) {
     next();
   }
