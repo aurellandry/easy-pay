@@ -4,6 +4,7 @@ const establishmentSchema = mongoose.Schema({
   name: {
     type: String,
     required: true,
+    unique: true,
   },
   address: {
     type: String,
@@ -12,6 +13,10 @@ const establishmentSchema = mongoose.Schema({
   additionalAddress: {
     type: String,
     required: false,
+  },
+  userIds: {
+    type: [Number],
+    required: true,
   },
 }, {
   timestamps: true,
