@@ -1,7 +1,8 @@
 import asyncHandler from 'express-async-handler';
 import generateToken from '../utils/generateToken.js';
-import { retrieveUser, retrieveUserById } from '../retrievers/userRetriever.js';
-import { createUser, saveUser } from '../updaters/userUpdater.js';
+import UserRetriever from '../retrievers/userRetriever.js';
+import UserUpdater from '../updaters/userUpdater.js';
+import constants from '../utils/constants.js';
 
 /**
  * @desc    Auth user / set token
@@ -11,12 +12,12 @@ import { createUser, saveUser } from '../updaters/userUpdater.js';
 const authUser = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
 
-  const user = await retrieveUser({ email });
+  const user = await UserRetriever.retrieveOne({ email });
   if (user && (await user.matchPassword(password))) {
     // Saves the token in a HTTP Cookie
     generateToken(res, user._id);
 
-    res.status(201).json({
+    res.status(constants.HTTP_CREATED).json({
       _id: user._id,
       firstName: user.firstName,
       lastName: user.lastName,
@@ -25,7 +26,7 @@ const authUser = asyncHandler(async (req, res) => {
     });
   }
 
-  res.status(401);
+  res.status(constants.HTTP_UNAUTHORIZED);
   throw new Error('Identifiants invalides.');
 });
 
@@ -37,13 +38,13 @@ const authUser = asyncHandler(async (req, res) => {
 const registerUser = asyncHandler(async (req, res) => {
   const { firstName, lastName, phone, email, password } = req.body;
 
-  const userExists = await retrieveUser({ email });
+  const userExists = await UserRetriever.retrieveOne({ email });
   if (userExists)  {
-    res.status(400);
+    res.status(constants.HTTP_BAD_REQUEST);
     throw new Error('Cet utilisateur existe déjà.')
   }
 
-  const user = await createUser({
+  const user = await UserUpdater.create({
     firstName,
     lastName,
     phone,
@@ -55,7 +56,7 @@ const registerUser = asyncHandler(async (req, res) => {
     // Saves the token in a HTTP Cookie
     generateToken(res, user._id);
 
-    res.status(201).json({
+    res.status(constants.HTTP_CREATED).json({
       _id: user._id,
       firstName: user.firstName,
       lastName: user.lastName,
@@ -64,7 +65,7 @@ const registerUser = asyncHandler(async (req, res) => {
     });
   }
 
-  res.status(400);
+  res.status(constants.HTTP_BAD_REQUEST);
   throw new Error('Impossible de créer l\'utilisateur. Vérifiez les données saisies.');
 });
 
@@ -79,7 +80,7 @@ const logoutUser = asyncHandler(async (req, res) => {
     expires: new Date(0),
   });
 
-  res.status(200).json({
+  res.status(constants.HTTP_OK).json({
     message: 'Utilisateur déconnecté.',
   });
 });
@@ -98,7 +99,7 @@ const getUserProfile = asyncHandler(async (req, res) => {
     email: req.user.email,
   };
 
-  res.status(200).json(user);
+  res.status(constants.HTTP_OK).json(user);
 });
 
 /**
@@ -107,21 +108,21 @@ const getUserProfile = asyncHandler(async (req, res) => {
  * @access  Private
  */
 const updateUserProfile = asyncHandler(async (req, res) => {
-  const user = await retrieveUserById(req.user._id);
+  const user = await UserRetriever.retrieveById(req.user._id);
 
   if (user) {
     user.firstName = req.body.firstName || user.firstName;
     user.lastName = req.body.lastName || user.lastName;
     user.email = req.body.email || user.email;
-    user.phone = req.user.phone || user.phone;
+    user.phone = req.body.phone || user.phone;
 
     if (req.body.password) {
       user.password = req.body.password || user.password;
     }
 
-    const updatedUser = await saveUser(user);
+    const updatedUser = await UserUpdater.save(user);
 
-    res.status(200).json({
+    res.status(constants.HTTP_OK).json({
       _id: updatedUser._id,
       firstName: updatedUser.firstName,
       lastName: updatedUser.lastName,
@@ -130,7 +131,7 @@ const updateUserProfile = asyncHandler(async (req, res) => {
     });
   }
 
-  res.status(404);
+  res.status(constants.HTTP_NOT_FOUND);
   throw new Error ('Cet utilisateur n\'existe pas.');
 });
 

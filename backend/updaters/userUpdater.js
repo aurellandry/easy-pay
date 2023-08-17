@@ -1,16 +1,17 @@
-import { create, save } from "./modelUpdater.js";
+import GenericModelUpdater from "./modelUpdater.js";
 import User from "../models/userModel.js";
 
-const createUser = async (fields) => {
-  const createdUser = await create(User, fields);
-
-  return createdUser;
+const UserUpdater = {
+  create: async (fields) => {
+    const createdUser = await GenericModelUpdater.create(User, fields);
+  
+    return createdUser;
+  },
+  save: async (user) => {
+    const updatedUser = await GenericModelUpdater.save(user);
+  
+    return updatedUser;
+  }
 };
 
-const saveUser = async (user) => {
-  const updatedUser = await save(user);
-
-  return updatedUser;
-};
-
-export { createUser, saveUser };
+export default UserUpdater;

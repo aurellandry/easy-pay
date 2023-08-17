@@ -1,19 +1,21 @@
 import User from "../models/userModel.js";
 
-export const retrieveUserById = async (id) => {
-  const user = await User.findById(id);
+const UserRetriever = {
+  retrieveOne: async (filter) => {
+    const user = await User.findOne(filter);
+  
+    return user;
+  },
+  retrieveAll: async (filter) => {
+    const user = await User.find(filter);
+  
+    return user;
+  },
+  retrieveById: async (id) => {
+    const user = await User.findById(id);
+  
+    return user;
+  },
+};
 
-  return user;
-}
-
-export const retrieveUser = async (filter) => {
-  const user = await User.findOne(filter);
-
-  return user;
-}
-
-export const retrieveUsers = async (filter) => {
-  const user = await User.find(filter);
-
-  return user;
-}
+export default UserRetriever;
