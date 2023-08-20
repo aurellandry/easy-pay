@@ -12,7 +12,7 @@ const EstablishmentRetriever = {
     return establishment;
   },
   retrieveById: async (id) => {
-    const establishment = await Establishment.find({ id });
+    const establishment = await Establishment.findOne({ id });
   
     return establishment;
   },

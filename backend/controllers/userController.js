@@ -12,7 +12,7 @@ import constants from '../utils/constants.js';
 const authUser = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
 
-  const user = await UserRetriever.retrieveOne({ email });
+  const user = await UserRetriever.retrieveOne({ email }, false);
   if (user && (await user.matchPassword(password))) {
     // Saves the token in a HTTP Cookie
     generateToken(res, user.id);
@@ -63,6 +63,7 @@ const registerUser = asyncHandler(async (req, res) => {
       phone: user.phone,
       email: user.email,
     });
+    return;
   }
 
   res.status(constants.HTTP_BAD_REQUEST);
@@ -97,6 +98,7 @@ const getUserProfile = asyncHandler(async (req, res) => {
     lastName: req.user.lastName,
     phone: req.user.phone,
     email: req.user.email,
+    establishmentIds: req.user.establishmentIds,
   };
 
   res.status(constants.HTTP_OK).json(user);
@@ -129,6 +131,7 @@ const updateUserProfile = asyncHandler(async (req, res) => {
       phone: updatedUser.phone,
       email: updatedUser.email,
     });
+    return;
   }
 
   res.status(constants.HTTP_NOT_FOUND);

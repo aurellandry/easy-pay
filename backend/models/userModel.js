@@ -20,10 +20,6 @@ const userSchema = mongoose.Schema({
     type: String,
     required: false,
   },
-  establishmentIds: {
-    type: [Number],
-    required: false,
-  },
   email: {
     type: String,
     required: true,
@@ -38,12 +34,12 @@ const userSchema = mongoose.Schema({
 });
 
 userSchema.pre('save', async function (next) {
-  if (this.isNew) {
-    this.id = await getNextModelID('user_id');
-  }
-
   if (!this.isModified('password')) {
     next();
+  }
+
+  if (this.isNew) {
+    this.id = await getNextModelID('user_id');
   }
 
   // hash password

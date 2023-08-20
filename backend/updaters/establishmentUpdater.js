@@ -13,7 +13,7 @@ const EstablishmentUpdater = {
     return updatedEstablishment;
   },
   deleteById: async (id) => {
-    const establishment = await Establishment.deleteOne({ _id: id });
+    const establishment = await Establishment.deleteOne({ id });
   
     return establishment;
   },
