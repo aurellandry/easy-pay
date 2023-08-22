@@ -8,10 +8,14 @@ import { useRegisterMutation } from '../slices/usersApiSlice';
 import { setCredentials } from '../slices/authSlice';
 import FormContainer from '../components/FormContainer';
 import Loader from '../components/Loader';
+import PhoneInput from 'react-phone-number-input';
+import 'react-phone-number-input/style.css'
 
 const RegisterScreen = () => {
-  const [name, setName] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
@@ -33,7 +37,14 @@ const RegisterScreen = () => {
       toast.error('Les mots de passes ne sont pas identiques.')
     } else {
       try {
-        const response = await register({ name, email, password }).unwrap();
+        const registerData = {
+          firstName,
+          lastName,
+          email,
+          phone,
+          password,
+        };
+        const response = await register(registerData).unwrap();
         dispatch(setCredentials({ ...response }));
         navigate('/');
       } catch (err) {
@@ -48,12 +59,22 @@ const RegisterScreen = () => {
 
       <Form onSubmit={submitHandler}>
         <Form.Group className='my-2' controlId='name'>
+          <Form.Label>Prénom</Form.Label>
+          <Form.Control
+            type='text'
+            placeholder='Prénom'
+            value={firstName}
+            onChange={ (e) => setFirstName(e.target.value) }
+          ></Form.Control>
+        </Form.Group>
+
+        <Form.Group className='my-2' controlId='name'>
           <Form.Label>Nom</Form.Label>
           <Form.Control
             type='text'
             placeholder='Nom'
-            value={name}
-            onChange={ (e) => setName(e.target.value) }
+            value={lastName}
+            onChange={ (e) => setLastName(e.target.value) }
           ></Form.Control>
         </Form.Group>
 
@@ -67,6 +88,16 @@ const RegisterScreen = () => {
           ></Form.Control>
         </Form.Group>
 
+        <Form.Group className='my-2' controlId='phone'>
+          <Form.Label>N° de téléphone</Form.Label>
+          <PhoneInput
+            placeholder='N° de téléphone'
+            defaultCountry='CM'
+            value={phone}
+            onChange={setPhone}
+          />
+        </Form.Group>
+
         <Form.Group className='my-2' controlId='password'>
           <Form.Label>Mot de passe</Form.Label>
           <Form.Control
@@ -77,7 +108,7 @@ const RegisterScreen = () => {
           ></Form.Control>
         </Form.Group>
 
-        <Form.Group className='my-2' controlId='password'>
+        <Form.Group className='my-2' controlId='confirmPassword'>
           <Form.Label>Confirmer le mot de passe</Form.Label>
           <Form.Control
             type='password'

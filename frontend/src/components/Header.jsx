@@ -37,7 +37,7 @@ const Header = () => {
             <Nav className='ms-auto'>
               { userInfo ? (
                 <>
-                  <NavDropdown title={userInfo.name} id='username'>
+                  <NavDropdown title={`Bonjour, ${userInfo.firstName}`} id='username'>
                     <LinkContainer to='/profile'>
                       <NavDropdown.Item>
                         Profil
