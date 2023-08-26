@@ -32,12 +32,30 @@ const Header = () => {
           <LinkContainer to='/'>
             <Navbar.Brand>Easy Pay</Navbar.Brand>
           </LinkContainer>
+          <Nav className="me-auto">
+            { userInfo ? (
+              <>
+                <LinkContainer to=''>
+                  <Nav.Link>Tableau de bord</Nav.Link>
+                </LinkContainer>
+              </>
+            ) : (
+              <>
+                <LinkContainer to=''>
+                  <Nav.Link>Services</Nav.Link>
+                </LinkContainer>
+                <LinkContainer to=''>
+                  <Nav.Link>Tarification</Nav.Link>
+                </LinkContainer>
+              </>
+            ) }
+          </Nav>
           <Navbar.Toggle aria-controls='basic-navbar-nav' />
           <Navbar.Collapse id='basic-navbar-nav'>
             <Nav className='ms-auto'>
               { userInfo ? (
                 <>
-                  <NavDropdown title={`Bonjour, ${userInfo.firstName}`} id='username'>
+                  <NavDropdown title={userInfo.firstName} id='username'>
                     <LinkContainer to='/profile'>
                       <NavDropdown.Item>
                         Profil
@@ -52,11 +70,11 @@ const Header = () => {
                     <Nav.Link>
                       <FaSignInAlt /> Connexion
                     </Nav.Link>
-                    </LinkContainer>
-                    <LinkContainer to='/register'>
-                      <Nav.Link>
-                        <FaSignOutAlt /> Inscription
-                      </Nav.Link>
+                  </LinkContainer>
+                  <LinkContainer to='/register'>
+                    <Nav.Link>
+                      <FaSignOutAlt /> Inscription
+                    </Nav.Link>
                   </LinkContainer>
                 </>
               ) }
