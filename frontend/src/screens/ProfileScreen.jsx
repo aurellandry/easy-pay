@@ -1,17 +1,17 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Form, Button, Row, Col } from 'react-bootstrap';
+import { Form, Button } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 
-import { useRegisterMutation } from '../slices/usersApiSlice';
 import { setCredentials } from '../slices/authSlice';
+import { useUpdateUserMutation } from '../slices/usersApiSlice';
 import FormContainer from '../components/FormContainer';
 import Loader from '../components/Loader';
 import PhoneInput from 'react-phone-number-input';
 import 'react-phone-number-input/style.css'
 
-const RegisterScreen = () => {
+const ProfileScreen = () => {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
@@ -22,14 +22,21 @@ const RegisterScreen = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const [register, { isLoading }] = useRegisterMutation();
   const { userInfo } = useSelector((state) => state.auth);
 
+  const [updateProfile, { isLoading }] = useUpdateUserMutation();
+
   useEffect(() => {
-    if (userInfo) {
-      navigate('/');
-    }
-  }, [navigate, userInfo]);
+    setFirstName(userInfo.firstName);
+    setLastName(userInfo.lastName);
+    setEmail(userInfo.email);
+    setPhone(userInfo.phone);
+  }, [
+    userInfo.setFirstName,
+    userInfo.setLastName,
+    userInfo.setEmail,
+    userInfo.setPhone,
+  ]);
 
   const submitHandler = async (e) => {
     e.preventDefault();
@@ -37,16 +44,16 @@ const RegisterScreen = () => {
       toast.error('Les mots de passes ne sont pas identiques.')
     } else {
       try {
-        const registerData = {
+        const userData = {
           firstName,
           lastName,
           email,
           phone,
           password,
         };
-        const response = await register(registerData).unwrap();
+        const response = await updateProfile(userData).unwrap();
         dispatch(setCredentials({ ...response }));
-        navigate('/dashboard');
+        toast.success('Profil mis à jour avec succès.')
       } catch (err) {
         toast.error(err?.data?.message || err.error);
       }
@@ -55,7 +62,7 @@ const RegisterScreen = () => {
 
   return (
     <FormContainer>
-      <h1>Inscription</h1>
+      <h1>Mettre à jour le profil</h1>
 
       <Form onSubmit={submitHandler}>
         <Form.Group className='my-2' controlId='name'>
@@ -121,17 +128,11 @@ const RegisterScreen = () => {
         { isLoading && <Loader /> }
 
         <Button type='submit' variant='primary' className='mt-3' disabled={isLoading}>
-          Inscription
+          Sauvegarder
         </Button>
-
-        <Row className='py-3'>
-          <Col>
-            Déjà inscrit ? <Link to='/login'>Connectez-vous</Link>
-          </Col>
-        </Row>
       </Form>
     </FormContainer>
   )
 }
 
-export default RegisterScreen;
+export default ProfileScreen;

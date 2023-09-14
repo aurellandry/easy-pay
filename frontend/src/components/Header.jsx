@@ -35,7 +35,7 @@ const Header = () => {
           <Nav className="me-auto">
             { userInfo ? (
               <>
-                <LinkContainer to=''>
+                <LinkContainer to='/dashboard'>
                   <Nav.Link>Tableau de bord</Nav.Link>
                 </LinkContainer>
               </>
